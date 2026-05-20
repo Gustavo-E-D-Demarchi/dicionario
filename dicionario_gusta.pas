@@ -8,15 +8,88 @@ uses crt;
 			ing : string;	// ingles
 			prox : Tverbete;
 		end; 
-	
+	 
 		Tlista = ^E_lista ;
 		E_lista = record 
 			ant : Tlista ; //anterior
-			key : string;
+			key : string; 
 			dicionario : Tverbete ;
 			prox : Tlista ;
 		end;
+	
+	function verificar_palavra ( D : Tverbete ; P : string ) : boolean ;
+	var
+		sair : boolean ;
+	begin	
+		if D^.br < P then
+			verificar_palavra := true 
+		else if D^.prox <> nil then
+			sair := false
+			else 
+			sair := true 
+
+		if sair then
+			verificar_palavra := false 
+		else 
+			verificar_palavra( D^.prox , P );
+	end;
+
+
+	function consultar ( T_lista : Tlista ; chave : string ) : Tlista ;
+	var 
+		atual : Tlista ;
+	begin
+		atual := T_lista ;
+
+		while ( atual <> nil ) and ( atual^.key < chave ) do
+			atual := atual^.prox ;
+		
+		if ( atual <> nil ) and ( atual ^.key = chave)
+			consultar := atual 
+		else 
+			consultar := nil ;
+	end;
    	
+	function ler : string ;
+	var
+		temp : string ;
+	begin
+		write (' digite a palavra :') ;
+		readln( temp ) ;
+		ler := temp ;
+	end;
+
+	function ler_int : integer ;
+	var 
+		temp : integer ;
+	begin
+		write (' digite um numero : ') ;
+		readln (temp) ;
+		ler_int := temp ;
+	end;
+
+	function continuar ( num : integer ) : boolean ;
+	var 
+		op : string ;
+	begin
+		if num = 1 then
+			continuar := true 
+		else 
+		begin
+			write ( 'quer continuar ? (S / N)' ) ;
+			op := ler ;
+			while ( op <> 'S' ) and ( op <> 'N') do
+			begin
+				writeln ('opcao invalida') ;
+				op := ler ;
+			end;
+			if op = 'S' then
+				continuar := true 
+			else 
+				continuar := false ;
+		end;
+	end;
+
 	{
 	function maior(a , b : string):boolean;
 	begin
@@ -26,7 +99,7 @@ uses crt;
 	procedure criar_lista ( var lista: Tlista );
 	begin
 		lista := nil;
-	end;
+	end;  
 
 	procedure adicionar_lista(var T_lista : Tlista );
 	var
@@ -74,67 +147,73 @@ uses crt;
 					atual^.ant := novo ;
 				
 			end;
-		end;
+		end; 
 	end; 
 		
-	procedure adicionar_dicionario(dicionario : E_dicionario);
+	procedure adicionar_dicionario( var dicionario : Tverbete );
 	var
-		aux , aux2 : Tlista;
+		aux , aux_atual , aux_ant : Tverbete ;
 		chave_p , chave_i : string ;
 //portugues /\      /\ inglês 
+		existe : boolean ;
 	begin
 		chave_p := ler ;
 		chave_i := ler ;
-			new(aux);
-			if aux = nil then
-				begin
-					writeln ('memoria cheia') ;
-				end
-			else
+		new(aux);
+		if aux = nil then
 			begin
-				if (dicionario = nil) then
+				writeln ('memoria cheia') ;
+			end
+		else
+		begin
+		aux := dicionario ;
+			if (aux = nil) then //adicionar o primeiro verbete
+				begin
+					aux^.br := chave_p ;
+					aux^.ing := chave_i ;
+					aux^.prox := dicionario ;
+					dicionario := aux ;
+				end
+            else 
+            begin
+				aux_ant := nil ;
+				aux_atual := aux ;
+				while (aux_atual <> nil) and ( aux_atual^.br < chave_p ) do
+				begin
+					aux_ant := aux_atual ;
+					aux_atual := aux_atual^.prox ;
+				end;
+				
+				existe := verificar_palavra( aux , chave_p); // verificar se a palavra ja existe no dicionario
+				
+				if not existe then
+				begin
+					if aux_ant = nil then
 					begin
 						aux^.br := chave_p ;
 						aux^.ing := chave_i ;
-						aux^.prox := dicionario ;
-						dicionario := aux ;
+						aux^.prox := aux_atual ;
+					end
+					else 
+					begin
+						aux_ant^.prox := aux ;
+						aux^.br := chave_p ;
+						aux^.ing := chave_i ;
+						aux^.prox := aux_atual;
 					end;
-				aux2 := aux ;
-				while (aux2 <> nil) and (aux2^.br < chave_p ) do
-				begin 
-					aux2 := aux2^.prox ;
-					aux := aux2 ;
-				end;
-				if aux2 = nil then
-				begin
-				
-				aux2^.br := chave_p ;
-				aux2^.ing := chave_i ;
-				
-				if aux <> nil then
-					aux2^.prox := aux 
-				else 
-					aux2^.prox := nil ;
-				
+				end
+				else
+					write (' esta palavra ja existe no dicionario ')
 
-				end;
 			end;
-					
+		end;
+				
 	end;
-	
-	function consultar ( T_lista : Tlista ; chave : string ) : Tlista ;
-	var 
-		atual : Tlista ;
-	begin
-		atual := T_lista ;
 
-		while ( atual <> nil ) and ( atual^.key < chave ) do
-			atual := atual^.prox ;
-		
-		if ( atual <> nil ) and ( atual ^.key = chave)
-			consultar := atual 
-		else 
-			consultar := nil ;
+	procedure adicionar_dicionario_lista (L , D) ;
+	var
+	begin
+		while (l <> nil) and (l^.dicionario < d) do 
 	end;
 
 
@@ -162,10 +241,11 @@ uses crt;
 	begin
 	end;
 
-	procedure menu ( var T_lista : Tlista);
+	procedure menu ( var lista : Tlista ; var dicionario : Tverbete);
 	var 
-		op : integer
+		op : integer ;
 	begin
+	
 		writeln (' 1 : adicionar_lista ') ;
 		writeln (' 2 : adicionar_dicionario ') ;
 		writeln (' 3 : consultar_lista ') ;
@@ -175,59 +255,26 @@ uses crt;
 		writeln (' 7 : remover_dicionario ');
 		writeln (' 0 : sair ');
 		op := ler_int ;
-		case ler_int of 
-			1 : adicionar_lista ; 
-			2 : adicionar_dicionario ;
-			3 : consultar_lista ;
-			4 : consultar_dicionario ;
-			5 : consultar_geral ;
-			6 : remover_lista ;
-			7 : remover_dicionario ;
+		case op of 
+			1 : adicionar_lista(lista) ; 
+			2 :
+			begin
+				adicionar_dicionario (dicionario) ;
+				adicionar_dicionario_lista (lista , dicionario)
+			end;
+			3 : consultar_lista (lista) ;
+			4 : consultar_dicionario (dicionario) ;
+			5 : consultar_geral (lista , dicionario) ;
+			6 :
+			begin
+				remover_lista (lista) ;
+				adicionar_dicionario_lista (lista , dicionario) ;
+			end;
+			7 : remover_dicionario (dicionario) ;
 		end
 		else if ( ) 
 			write (' opcao invalida digite novamente : ');
 	end;
-
-	function ler : string ;
-	var
-		temp : string ;
-	begin
-		write (' digite a palavra :') ;
-		readln( temp ) ;
-		ler := temp ;
-	end;
-
-	function ler_int : integer ;
-	var 
-		temp : integer ;
-	begin
-		write (' digite um numero : ') ;
-		readln (temp) ;
-		ler_int := temp ;
-	end;
-
-	function continuar ( num : integer ) : boolean ;
-	var 
-		op : string ;
-	begin
-		if num = 1 then
-			continuar := true 
-		else
-		begin
-			write ( 'quer continuar ? (S / N)' ) ;
-			op := ler ;
-			while ( op <> 'S' ) and ( op <> 'N') do
-			begin
-				writeln ('opcao invalida') ;
-				op := ler ;
-			end;
-			if op = 'S' then
-				continuar := true 
-			else 
-				continuar := false ;
-		end;
-	end;
-
 var 
 	lista : Tlista ;
 
