@@ -1,0 +1,135 @@
+# 📚 Projeto PZIM — Dicionário com Lista Encadeada em Pascal
+
+Este projeto implementa um sistema de dicionário utilizando **listas encadeadas duplamente ligadas** em Pascal.  
+Cada elemento da lista principal representa uma chave (categoria), e cada chave possui um sub-dicionário de palavras (português → inglês).
+
+---
+
+## 🧠 Estrutura de Dados
+
+### 📌 Lista principal (Tlista)
+Cada nó representa uma chave:
+
+- `key` → nome da categoria
+- `ant` → ponteiro para o anterior
+- `prox` → ponteiro para o próximo
+- `dicionario` → ponteiro para a lista de verbetes
+
+### 📌 Dicionário (Tverbete)
+Cada nó representa uma palavra:
+
+- `br` → palavra em português
+- `ing` → tradução em inglês
+- `prox` → próximo verbete
+
+---
+
+## 🟢 Estado Atual do Projeto
+
+### ✔ Estrutura de dados
+- Lista encadeada dupla implementada
+- Sublistas de dicionário por chave
+- Inserção ordenada nas listas
+
+---
+
+## 🟡 Funcionalidades Implementadas
+
+### 📌 Funções básicas
+- Leitura de string (`ler`)
+- Leitura de inteiro (`ler_int`)
+- Função de continuar execução (`continuar`)
+- Consulta de elementos na lista (`consultar`)
+
+---
+
+### 📌 Lista principal (Tlista)
+- Criar lista
+- Adicionar chave (inserção ordenada)
+
+---
+
+### 📌 Dicionário (Tverbete)
+- Inserção de palavras por chave
+- Inserção ordenada no sub-dicionário
+- Associação de palavras a uma chave existente
+
+---
+
+## 🔴 Funcionalidades Faltantes
+
+### 📌 Lista principal
+- Remover nó da lista (`remover_lista`)
+- Listagem completa das chaves
+- Percorrer e exibir estrutura completa
+
+---
+
+### 📌 Dicionário
+- Remover verbete (`remover_dicionario`)
+- Buscar palavra diretamente no dicionário
+- Listar palavras de uma chave
+
+---
+
+### 📌 Integração
+- Consulta geral (lista + dicionário)
+- Sincronização robusta entre lista e sublistas
+- Melhor tratamento de erros e validações
+
+---
+
+### 📌 Sistema / Menu
+- Melhor tratamento de opção inválida
+- Finalização controlada do programa
+- Organização das chamadas do menu
+
+---
+
+## 🚨 Problemas Identificados
+
+- Lógica de verificação de palavras pode ser simplificada
+- Algumas inserções precisam de melhor controle de fluxo
+- Falta padronização em validações
+- Algumas funções ainda não implementadas
+
+---
+
+## 🧭 Prioridades de Desenvolvimento
+
+Para evoluir o projeto corretamente:
+
+1. 🔧 Corrigir e simplificar `verificar_palavra`
+2. ➖ Implementar `remover_lista`
+3. ➖ Implementar `remover_dicionario`
+4. 🔍 Criar `consultar_geral`
+5. 📋 Implementar listagem completa
+6. 🧪 Testar inserção, busca e remoção
+
+---
+
+## 💡 Objetivo do Projeto
+
+O objetivo é praticar:
+
+- Estruturas de dados dinâmicas
+- Listas encadeadas duplas
+- Organização de dicionários em subestruturas
+- Manipulação de ponteiros em Pascal
+- Lógica de inserção e busca ordenada
+
+---
+
+## 🛠 Tecnologias
+
+- Linguagem: Pascal
+- Biblioteca: CRT (entrada/saída básica)
+- Estrutura: Listas encadeadas
+
+---
+
+## 📌 Observação
+
+Este projeto está em desenvolvimento e ainda possui funcionalidades incompletas, mas já demonstra uma estrutura funcional de dicionário hierárquico com listas encadeadas.
+
+---
