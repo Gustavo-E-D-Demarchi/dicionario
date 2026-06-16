@@ -1,344 +1,466 @@
-program dicionario;
+program pzim;
+uses crt;
+
 type
-    TponteiroDic = ^dic;
+		Tverbete = ^E_Dicionario;
+		E_Dicionario = record
+		br : string;
+		ing : string;
+		prox : Tverbete;
+	end;
 
-dic = record
-    verbete: string;
-    prox: Tponteirodic;
-end;
+		Tlista = ^E_lista;
+		E_lista = record
+		ant : Tlista;
+		key : string;
+		dicionario : Tverbete;
+		prox : Tlista;
+	end;
 
-Tponteiro = ^no;
-no = record
-    palavra: string;
-    dic: TponteiroDic;
-    prox: Tponteiro;
-    ant: Tponteiro;
-end;
 
-Tlista = record
-    inicio: Tponteiro;
-    fim: Tponteiro;
-end;
 
-var lista: Tlista;
-	op: integer;
-	palavra, verbete: string;
-
-function verificaVazio(l: tlista): boolean;
+function ler : string;
+var
+	temp : string;
 begin
-    verificaVazio:= l.inicio = nil;
+	write (' digite a palavra : ');
+	readln(temp);
+	ler := temp;
 end;
 
-procedure inicializarLista(var l: tlista);
+function ler_int : integer;
+var
+ 	temp : integer;
 begin
-	l.inicio:= nil;
-	l.fim:= nil;
+	write (' digite um numero : ');
+	readln(temp);
+	ler_int := temp;
 end;
 
-function verificaPalavra(l: tlista; p: string): boolean;
-var aux: Tponteiro;
+
+function buscar_verbete (D : Tverbete; P : string) : Tverbete;
 begin
-	aux:= l.inicio;
-	while (aux <> nil) and (aux^.palavra <> p) do
-		aux:= aux^.prox;
-	if aux = nil then
-		verificaPalavra:= false
+ 	if D = nil then
+  		buscar_verbete := nil
 	else
-		verificaPalavra:= true;
-end;
-
-function verificaVerbete(l: tlista; p, v: string): boolean;
-var aux: Tponteiro;
-	aux2: TponteiroDic;
-begin
-	aux:= l.inicio;
-	while (aux <> nil) and (aux^.palavra <> p) do
-		aux:= aux^.prox;
-	if aux <> nil then
 	begin
-		aux2:= aux^.dic;
-		while (aux2 <> nil) and (aux2^.verbete <> v) do
-			aux2:= aux2^.prox;
-		if aux2 = nil then
-			verificaVerbete:= false
+		if D^.br = P then
+			buscar_verbete := D
 		else
-			verificaVerbete:= true;
-	end
-	else
-		verificaVerbete:= false;
+		buscar_verbete := buscar_verbete(D^.prox , P);
+	end;
 end;
-	
 
 
-procedure inserirPalavra(var l: Tlista; p: string);
-var novo, temp, aux: Tponteiro;
+function encontrar_lista (T_lista : Tlista; palavra : string) : Tlista;
+var
+	aux : Tlista;
+	melhor : Tlista;
 begin
-    new(novo);
-    if novo <> nil then
+	aux := T_lista;
+	melhor := nil;
+
+	while aux <> nil do
+	begin
+		if UpCase(palavra[1]) >= UpCase(aux^.key[1]) then
+		begin
+			melhor := aux;
+		end;
+		aux := aux^.prox;
+	end;
+ 	
+	encontrar_lista := melhor; // retorna a lista pra inserir ou nil se nao achar nada, vulgo lista vazia
+end;
+
+procedure redistribuir_verbetes (var lista : Tlista; chave : string);
+var
+	nova : Tlista;
+	ant_d , aux_d : Tverbete;
+	primeira , sair : boolean;
+begin
+   	ant_d := nil;
+ 	nova := lista;
+ 	while (nova <> nil) and (nova^.key <> chave) do
+  		nova := nova^.prox;
+
+ 	if (nova = nil) or (nova^.ant = nil) then
+ 	begin
+  		primeira := true;
+  		aux_d := nil;
+ 	end
+ 	else
+ 	begin
+  		primeira := false;
+  		aux_d := nova^.ant^.dicionario;
+ 	end;
+    sair := false ;
+    
+    
+  while (aux_d <> nil) and (not primeira) and (not sair) do
+  begin
+    if UpCase(aux_d^.br[1]) >= UpCase(nova^.key[1]) then
     begin
-        if not verificaPalavra(l, p) then
-        begin
-            novo^.prox:= nil;
-            novo^.ant:= nil;
-			novo^.dic:= nil;
-            novo^.palavra:= p;
-            if verificaVazio(l) then
-            begin
-                l.inicio:= novo;
-                l.fim:= novo;
-            end
-            else if p < l.inicio^.palavra then
-            begin
-                temp:= l.inicio;
-                l.inicio:= novo;
-                novo^.prox:= temp;
-                temp^.ant:= novo;
-            end
-            else
-            begin
-                aux:= l.inicio;
-                while (aux^.prox <> nil) and (aux^.prox^.palavra < p) do
-                    aux:= aux^.prox;
-                if aux^.prox = nil then
-                begin
-                    aux^.prox:= novo;
-                    novo^.ant:= aux;
-                    l.fim:= novo;
-                end
-                else
-                begin
-                    temp:= aux^.prox;
-                    aux^.prox:= novo;
-                    novo^.prox:= temp;
-                    novo^.ant:= aux;
-                    temp^.ant:= novo;
-                end;
-            end;
-        end
-        else
-            writeln('essa palavra já existe');
+      if ant_d = nil then
+        nova^.ant^.dicionario := nil
+      else
+        ant_d^.prox := nil;
+
+      nova^.dicionario := aux_d;
+
+      sair := true;
     end
     else
-        writeln('Memória cheia hahaha');
+    begin
+      ant_d := aux_d;
+      aux_d := aux_d^.prox;
+    end;
+  end;
 end;
 
-procedure inserirVerbete(var l: tLista; p, v: string);
-var novo, temp, temp2: TponteiroDIc;
-	aux: Tponteiro;
+
+procedure lista_iniciar (var lista : Tlista);
 begin
-	new(novo);
-	if novo <> nil then
+	lista := nil;
+end;
+
+procedure dicionario_adicionar (var dicionario : Tverbete; br , ing : string);
+var
+ 	novo , aux_atual , aux_ant : Tverbete;
+begin
+ 	new (novo);
+
+	novo^.br := br;
+	novo^.ing := ing;
+	novo^.prox := nil;
+
+	aux_atual := dicionario;
+	aux_ant := nil;
+
+	while (aux_atual <> nil) and (aux_atual^.br < novo^.br) do
 	begin
-		if not verificaVerbete(l, p, v) then
+		aux_ant := aux_atual;
+		aux_atual := aux_atual^.prox;
+	end;
+
+ 	novo^.prox := aux_atual;
+
+	if aux_ant = nil then
+		dicionario := novo
+	else
+		aux_ant^.prox := novo;
+end;
+
+procedure dicionario_remover (var dicionario : Tverbete; palavra : string; var removido : Tverbete);
+var
+ 	aux , ant : Tverbete;
+begin
+	removido := nil;
+	aux := dicionario;
+	ant := nil;
+
+	while (aux <> nil) and (removido = nil) do
+	begin
+		if aux^.br = palavra then
 		begin
-			aux:= l.inicio;
-			novo^.verbete:= v;
-			novo^.prox:= nil;
-			while (aux <> nil) and (aux^.palavra <> p) do
-				aux:= aux^.prox;
-			if aux^.palavra = p then
-			begin
-				if aux^.dic = nil then
-					aux^.dic:= novo
-				else if v < aux^.dic^.verbete then
-				begin
-					temp:= aux^.dic;
-					aux^.dic:= novo;
-					aux^.dic^.prox:= temp;
-				end
-				else
-				begin
-					temp:= aux^.dic;
-					while (temp^.prox <> nil) and (temp^.prox^.verbete < v) do
-						temp:= temp^.prox;
-					temp2:= temp^.prox;
-					temp^.prox:= novo;
-					novo^.prox:= temp2;
-				end;
-			end
+			if ant = nil then
+				dicionario := aux^.prox
 			else
-				writeln('Palavra não encontrada');
-		end
+				ant^.prox := aux^.prox;
+
+			aux^.prox := nil;
+			removido := aux;
+			aux := nil;
+		end;
+
+  		ant := aux;
+  		aux := aux^.prox;
+ 	end;
+end;
+
+procedure lista_adicionar (var lista : Tlista);
+var
+ 	novo , anterior , atual : Tlista;
+ 	chave:string;
+begin
+ 	chave := ler();
+ 	new (novo);
+
+	novo^.key := chave;
+	novo^.dicionario := nil;
+	novo^.prox := nil;
+	novo^.ant := nil;
+
+	atual := lista;
+	anterior := nil;
+
+	while (atual <> nil) and (atual^.key < chave) do
+	begin
+		anterior := atual;
+		atual := atual^.prox;
+	end;
+
+	novo^.ant := anterior;
+	novo^.prox := atual;
+
+	if anterior <> nil then
+		anterior^.prox := novo
+	else
+		lista := novo;
+
+	if atual <> nil then
+		atual^.ant := novo;
+
+ 	redistribuir_verbetes (lista , chave);
+end;
+
+
+procedure mover_verbetes_para_listas (var lista : Tlista; var origem : Tverbete);
+var
+ 	aux_d , prox_d : Tverbete;
+ 	destino : Tlista;
+begin
+ 	aux_d := origem;
+ 	origem := nil;
+
+	while aux_d <> nil do
+	begin
+		prox_d := aux_d^.prox;
+		aux_d^.prox := nil;
+
+		destino := encontrar_lista (lista , aux_d^.br);
+		
+		if destino <> nil then
+			dicionario_adicionar (destino^.dicionario , aux_d^.br , aux_d^.ing)
 		else
-			writeln('O verbete ja está na lista')
+			dispose (aux_d);
+
+		aux_d := prox_d;
+	end;
+end;
+
+procedure adicionar_dicionario (var lista : Tlista);
+var
+	aux_l : Tlista;
+	chave_p , chave_i : string;
+begin
+	writeln(' digite a palavra em portugues : ');
+	chave_p := ler;
+
+	writeln(' digite a traducao em ingles : ');
+	chave_i := ler;
+
+	aux_l := encontrar_lista (lista , chave_p);
+
+	if aux_l = nil then
+	begin
+		writeln(' nenhuma chave encontrada ');
 	end
 	else
-		writeln('Memória cheia');
+	begin
+		if buscar_verbete(aux_l^.dicionario, chave_p) <> nil then
+			writeln(' palavra ja existe ')
+		else
+			dicionario_adicionar(aux_l^.dicionario, chave_p, chave_i);
+	end;
 end;
 
-procedure removerVerbete(var l: Tlista; p: string; v: string);
-var aux: Tponteiro;
-	temp, temp2: TponteiroDIc;
+procedure consultar_lista (T_lista : Tlista);
+var
+ 	aux : Tlista;
 begin
-	if verificaVazio(l) then
-		writeln('Lista de palavras vazia')
+ 	aux := T_lista;
+
+	if aux = nil then
+	begin
+		writeln(' lista vazia ');
+	end
 	else
 	begin
-		aux:= l.inicio;
-		while (aux <> nil) and (aux^.palavra <> p) do
-			aux:= aux^.prox;
-		if aux = nil then
-			writeln('Palavra não encontrada')
-		else if aux^.dic = nil then
-			writeln('A palavra não possui verbetes')
-		else if aux^.dic^.verbete = v then
+		while aux <> nil do
 		begin
-			temp:= aux^.dic;
-			aux^.dic:= aux^.dic^.prox;
-			dispose(temp);
-		end
-		else
-		begin
-			temp:= aux^.dic;
-			while (temp^.prox <> nil) and (temp^.prox^.verbete <> v) do
-				temp:= temp^.prox;
-			if temp^.prox = nil then
-				writeln('O verbete não está na lista')
-			else
-			begin
-				temp2:= temp^.prox;
-				temp^.prox:= temp^.prox^.prox;
-				dispose(temp2);
-			end;
+			writeln(' chave : ' , aux^.key);
+			aux := aux^.prox;
 		end;
 	end;
 end;
 
-procedure consultar(l: Tlista; p: string);
-var aux: Tponteiro;
-	temp: TponteiroDic;
+procedure consultar_dicionario (T_lista : Tlista);
+var
+	aux_l : Tlista;
+	aux_d : Tverbete;
+	palavra : string;
+	encontrou : boolean;
 begin
-	if verificaVazio(l) then
-		writeln('Lista vazia')
-	else
+	palavra := ler;
+
+	aux_l := T_lista;
+	encontrou := false;
+
+	while (aux_l <> nil) and (not encontrou) do
 	begin
-		aux:= l.inicio;
-		while (aux <> nil) and (aux^.palavra <> p) do
-			aux:= aux^.prox;
-		if aux = nil then
-			writeln('Palavra não encontrada')
-		else
+		aux_d := buscar_verbete (aux_l^.dicionario , palavra);
+		if aux_d <> nil then
 		begin
-			temp:= aux^.dic;
-			if temp = nil then
-				writeln('A palavra não possui verbetes')
-			else
-			begin
-				write('Verbetes: ');
-				while (temp <> nil) do
-				begin
-					write(temp^.verbete, ' ');
-					temp:= temp^.prox;
-				end;
-			end;	
-		end;
-	end;
-end;
-		
-		
-procedure escreverTudo(l: tlista);
-var aux: Tponteiro;
-	temp: TponteiroDic;
-begin
-	if verificaVazio(l) then
-		writeln('Lista vazia')
-	else
-	begin
-		aux:= l.inicio;
-		while (aux <> nil) do
-		begin
-			write(aux^.palavra, ': ');
-			temp:= aux^.dic;
-			while (temp <> nil) do
-			begin
-				write(temp^.verbete);
-				if temp^.prox <> nil then
-					write(', ');
-				temp:= temp^.prox;
-			end;
 			writeln;
-			aux:= aux^.prox;
+			writeln(' chave : ' , aux_l^.key);
+			writeln(aux_d^.br , ' = ' , aux_d^.ing);
+			encontrou := true;
 		end;
+		aux_l := aux_l^.prox;
 	end;
+	
+	if not encontrou then
+		writeln(' palavra nao encontrada ');
 end;
 
-function formatarString(s: string): string;
-var i: integer;
-	resultado: string;
+procedure consultar_geral (T_lista : Tlista);
+var
+ 	aux_l : Tlista;
+ 	aux_d : Tverbete;
 begin
-	resultado:= '';
-	if length(s) > 0 then
+	aux_l := T_lista;
+	if aux_l = nil then
 	begin
-		resultado:= upcase(s[1]);
-		for i:= 2 to length(s) do
+		wrieln(' lista vazia ');
+	end
+	else
+	begin
+		while aux_l <> nil do
 		begin
-			if (s[i] >= 'A') and (s[i] <= 'Z') then
-				resultado:= resultado + char(ord(s[i]) + 32)
+			writeln;
+			writeln(' chave : ' , aux_l^.key);
+
+			aux_d := aux_l^.dicionario;
+
+			if aux_d = nil then
+			begin
+				writeln(' dicionario vazio ');
+			end
 			else
-				resultado:= resultado + s[i];
+			begin
+				while aux_d <> nil do
+				begin
+				writeln(' ',aux_d^.br ,' = ' ,aux_d^.ing);
+				aux_d := aux_d^.prox;
+				end;
+			end;
+			aux_l := aux_l^.prox;
 		end;
-	end;
-	formatarString:= resultado;
+ end;
 end;
 
+procedure remover_dicionario (T_lista : Tlista);
+var
+	aux_l : Tlista;
+	aux_d : Tverbete;
+	palavra : string;
+	achou : boolean;
 begin
-	inicializarLista(lista);
-	op:= 0;
-	while op <> 6 do
+ 	palavra := ler;
+
+	aux_l := T_lista;
+	achou := false;
+
+while (aux_l <> nil) and (not achou) do
+begin
+
+dicionario_remover (aux_l^.dicionario , palavra , aux_d);
+
+if aux_d <> nil then
 	begin
-		writeln;
-		writeln('1 - Inserir palavra');
-		writeln('2 - Inserir verbete');
-		writeln('3 - Remover verbete');
-		writeln('4 - Consultar');
-		writeln('5 - Escrever tudo');
-		writeln('6 - Sair');
-		write('Opcao: ');
-		readln(op);
-		case op of
-			1: begin
-				writeln;
-				write('Palavra: ');
-				readln(palavra);
-				palavra:= formatarString(palavra);
-				inserirPalavra(lista, palavra);
-			end;
-			2: begin
-				writeln;
-				write('Palavra: ');
-				readln(palavra);
-				write('Verbete: ');
-				readln(verbete);
-				palavra:= formatarString(palavra);
-				verbete:= formatarString(verbete);
-				inserirVerbete(lista, palavra, verbete);
-			end;
-			3: begin
-				writeln;
-				write('Palavra: ');
-				readln(palavra);
-				write('Verbete: ');
-				readln(verbete);
-				palavra:= formatarString(palavra);
-				verbete:= formatarString(verbete);
-				removerVerbete(lista, palavra, verbete);
-			end;
-			4: begin
-				writeln;
-				write('Digite a palavra a ser consultada: ');
-				readln(palavra);
-				palavra:= formatarString(palavra);
-				writeln;
-				consultar(lista, palavra);
-				writeln;
-			end;
-			5: begin
-				writeln;	
-				escreverTudo(lista);
-				writeln;
-			end;
-		else
-			writeln('Opcao invalida');
-		end;
+		dispose (aux_d);
+		achou := true;
 	end;
-end .
+aux_l := aux_l^.prox;
+end;
+
+if achou then
+  	writeln(' palavra removida ')
+else
+	writeln(' palavra nao encontrada ');
+end;	
+
+procedure remover_lista(var lista : Tlista);
+var
+	aux, ant : Tlista;
+	aux_d : Tverbete;
+	chave : string;
+begin
+	writeln(' digite a chave : ');
+	chave := ler;
+	aux := lista;
+	ant := nil;
+
+ while (aux <> nil) and (aux^.key <> chave) do
+ begin
+	ant := aux;
+	aux := aux^.prox;
+ end;
+
+	if aux = nil then
+		writeln(' chave nao encontrada ')
+	else
+		begin
+			if ant = nil then
+				lista := aux^.prox
+			else
+				ant^.prox := aux^.prox;
+
+			if aux^.prox <> nil then
+				aux^.prox^.ant := ant;
+
+				aux_d := aux^.dicionario;
+				aux^.dicionario := nil;
+				mover_verbetes_para_listas(lista, aux_d);
+				dispose(aux);
+				writeln(' chave removida ');
+		end;
+end;
+
+procedure menu (var lista : Tlista; var j : integer);
+var
+	op : integer;
+begin
+		writeln;
+		writeln(' 1 - adicionar lista ');
+		writeln(' 2 - adicionar dicionario ');
+		writeln(' 3 - consultar lista ');
+		writeln(' 4 - consultar dicionario ');
+		writeln(' 5 - consultar geral ');
+		writeln(' 6 - remover lista ');
+		writeln(' 7 - remover dicionario ');
+		writeln(' 0 - sair ');
+
+	op := ler_int;
+
+	case op of
+		1 : lista_adicionar (lista);
+		2 : adicionar_dicionario (lista);
+		3 : consultar_lista (lista);
+		4 : consultar_dicionario (lista);
+		5 : consultar_geral (lista);
+		6 : remover_lista (lista);
+		7 : remover_dicionario (lista);
+
+		0 : begin
+			writeln(' saindo... ');
+			j := 0;
+		end;
+		else
+			writeln(' opcao invalida ');
+		end;
+end;
+
+var
+	lista : Tlista;
+ 	i : integer;
+
+begin
+	i := 1;
+
+	lista_iniciar (lista);
+
+	while i = 1 do
+	begin
+	end;
+end.

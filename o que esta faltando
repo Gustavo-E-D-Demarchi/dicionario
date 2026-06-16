@@ -1,135 +1,370 @@
-# 📚 Projeto PZIM — Dicionário com Lista Encadeada em Pascal
+# Dicionário Português-Inglês em Pascal
 
-Este projeto implementa um sistema de dicionário utilizando **listas encadeadas duplamente ligadas** em Pascal.  
-Cada elemento da lista principal representa uma chave (categoria), e cada chave possui um sub-dicionário de palavras (português → inglês).
+## Descrição
 
----
+Este programa implementa um dicionário Português-Inglês utilizando listas encadeadas dinâmicas em Pascal.
 
-## 🧠 Estrutura de Dados
+A estrutura principal é composta por:
 
-### 📌 Lista principal (Tlista)
-Cada nó representa uma chave:
+* Uma lista duplamente encadeada de chaves.
+* Cada chave possui um dicionário próprio.
+* Cada dicionário é uma lista simplesmente encadeada de verbetes.
 
-- `key` → nome da categoria
-- `ant` → ponteiro para o anterior
-- `prox` → ponteiro para o próximo
-- `dicionario` → ponteiro para a lista de verbetes
+Cada verbete contém:
 
-### 📌 Dicionário (Tverbete)
-Cada nó representa uma palavra:
+* Palavra em português.
+* Tradução em inglês.
 
-- `br` → palavra em português
-- `ing` → tradução em inglês
-- `prox` → próximo verbete
+Exemplo:
 
----
+Chave: A
 
-## 🟢 Estado Atual do Projeto
+* Abacaxi = Pineapple
+* Amor = Love
+* Avião = Airplane
 
-### ✔ Estrutura de dados
-- Lista encadeada dupla implementada
-- Sublistas de dicionário por chave
-- Inserção ordenada nas listas
+Chave: M
+
+* Mesa = Table
+* Morango = Strawberry
 
 ---
 
-## 🟡 Funcionalidades Implementadas
+# Estruturas Utilizadas
 
-### 📌 Funções básicas
-- Leitura de string (`ler`)
-- Leitura de inteiro (`ler_int`)
-- Função de continuar execução (`continuar`)
-- Consulta de elementos na lista (`consultar`)
+## Tverbete
 
----
+Representa um verbete do dicionário.
 
-### 📌 Lista principal (Tlista)
-- Criar lista
-- Adicionar chave (inserção ordenada)
+Campos:
 
----
+* br: palavra em português.
+* ing: tradução em inglês.
+* prox: próximo verbete da lista.
 
-### 📌 Dicionário (Tverbete)
-- Inserção de palavras por chave
-- Inserção ordenada no sub-dicionário
-- Associação de palavras a uma chave existente
+## Tlista
 
----
+Representa uma chave do dicionário.
 
-## 🔴 Funcionalidades Faltantes
+Campos:
 
-### 📌 Lista principal
-- Remover nó da lista (`remover_lista`)
-- Listagem completa das chaves
-- Percorrer e exibir estrutura completa
+* key: letra ou chave identificadora.
+* dicionario: lista de verbetes pertencentes à chave.
+* ant: chave anterior.
+* prox: próxima chave.
 
 ---
 
-### 📌 Dicionário
-- Remover verbete (`remover_dicionario`)
-- Buscar palavra diretamente no dicionário
-- Listar palavras de uma chave
+# Funções
+
+## ler
+
+Lê uma string digitada pelo usuário.
+
+Retorno:
+
+* String informada pelo usuário.
 
 ---
 
-### 📌 Integração
-- Consulta geral (lista + dicionário)
-- Sincronização robusta entre lista e sublistas
-- Melhor tratamento de erros e validações
+## ler_int
+
+Lê um número inteiro digitado pelo usuário.
+
+Retorno:
+
+* Valor inteiro informado.
 
 ---
 
-### 📌 Sistema / Menu
-- Melhor tratamento de opção inválida
-- Finalização controlada do programa
-- Organização das chamadas do menu
+## buscar_verbete
+
+Procura uma palavra dentro de um dicionário.
+
+Parâmetros:
+
+* D: dicionário onde será feita a busca.
+* P: palavra procurada.
+
+Retorno:
+
+* Ponteiro para o verbete encontrado.
+* Nil caso não exista.
+
+Método utilizado:
+
+Busca recursiva.
 
 ---
 
-## 🚨 Problemas Identificados
+## encontrar_lista
 
-- Lógica de verificação de palavras pode ser simplificada
-- Algumas inserções precisam de melhor controle de fluxo
-- Falta padronização em validações
-- Algumas funções ainda não implementadas
+Localiza a chave responsável por armazenar determinada palavra.
 
----
+Parâmetros:
 
-## 🧭 Prioridades de Desenvolvimento
+* T_lista: lista principal.
+* palavra: palavra a ser localizada.
 
-Para evoluir o projeto corretamente:
+Retorno:
 
-1. 🔧 Corrigir e simplificar `verificar_palavra`
-2. ➖ Implementar `remover_lista`
-3. ➖ Implementar `remover_dicionario`
-4. 🔍 Criar `consultar_geral`
-5. 📋 Implementar listagem completa
-6. 🧪 Testar inserção, busca e remoção
+* Ponteiro para a chave adequada.
+* Nil caso não exista chave compatível.
 
 ---
 
-## 💡 Objetivo do Projeto
+# Procedimentos
 
-O objetivo é praticar:
+## lista_iniciar
 
-- Estruturas de dados dinâmicas
-- Listas encadeadas duplas
-- Organização de dicionários em subestruturas
-- Manipulação de ponteiros em Pascal
-- Lógica de inserção e busca ordenada
+Inicializa a estrutura principal.
 
----
+Ação:
 
-## 🛠 Tecnologias
-
-- Linguagem: Pascal
-- Biblioteca: CRT (entrada/saída básica)
-- Estrutura: Listas encadeadas
+* Define a lista principal como vazia.
 
 ---
 
-## 📌 Observação
+## dicionario_adicionar
 
-Este projeto está em desenvolvimento e ainda possui funcionalidades incompletas, mas já demonstra uma estrutura funcional de dicionário hierárquico com listas encadeadas.
+Insere um novo verbete em ordem alfabética.
+
+Parâmetros:
+
+* dicionario
+* br
+* ing
+
+Ação:
+
+* Cria um novo verbete.
+* Insere mantendo a ordenação alfabética.
 
 ---
+
+## dicionario_remover
+
+Remove um verbete de um dicionário.
+
+Parâmetros:
+
+* dicionario
+* palavra
+* removido
+
+Ação:
+
+* Procura a palavra.
+* Remove da lista.
+* Retorna o ponteiro removido.
+
+---
+
+## lista_adicionar
+
+Insere uma nova chave.
+
+Parâmetros:
+
+* lista
+
+Ação:
+
+* Cria uma nova chave.
+* Mantém as chaves ordenadas.
+* Atualiza ponteiros anterior e próximo.
+* Redistribui verbetes quando necessário.
+
+---
+
+## redistribuir_verbetes
+
+Redistribui verbetes após a criação de uma nova chave.
+
+Parâmetros:
+
+* lista
+* chave
+
+Ação:
+
+* Localiza a nova chave.
+* Analisa o dicionário da chave anterior.
+* Separa os verbetes que agora pertencem à nova chave.
+* Move esses verbetes para o novo dicionário.
+
+Exemplo:
+
+Antes:
+
+Chave A
+
+* Abacaxi
+* Banana
+* Morango
+
+Após criar a chave M:
+
+Chave A
+
+* Abacaxi
+* Banana
+
+Chave M
+
+* Morango
+
+---
+
+## mover_verbetes_para_listas
+
+Redistribui verbetes quando uma chave é removida.
+
+Parâmetros:
+
+* lista
+* origem
+
+Ação:
+
+* Percorre todos os verbetes da chave removida.
+* Procura uma nova chave compatível.
+* Reinsere os verbetes.
+* Descarta os verbetes sem destino válido.
+
+---
+
+## adicionar_dicionario
+
+Adiciona uma nova palavra ao sistema.
+
+Ação:
+
+* Solicita palavra em português.
+* Solicita tradução.
+* Localiza a chave correta.
+* Insere o verbete.
+
+---
+
+## consultar_lista
+
+Exibe todas as chaves cadastradas.
+
+Ação:
+
+* Percorre a lista principal.
+* Mostra cada chave.
+
+---
+
+## consultar_dicionario
+
+Busca uma palavra específica.
+
+Ação:
+
+* Procura a palavra em todas as chaves.
+* Exibe a tradução caso encontrada.
+
+---
+
+## consultar_geral
+
+Exibe todo o conteúdo do sistema.
+
+Ação:
+
+* Mostra todas as chaves.
+* Mostra todos os verbetes de cada chave.
+
+---
+
+## remover_dicionario
+
+Remove uma palavra do sistema.
+
+Ação:
+
+* Procura a palavra.
+* Remove o verbete.
+* Libera a memória utilizada.
+
+---
+
+## remover_lista
+
+Remove uma chave inteira.
+
+Ação:
+
+* Remove a chave da lista principal.
+* Redistribui seus verbetes.
+* Libera a memória da chave removida.
+
+---
+
+## menu
+
+Controla a interação com o usuário.
+
+Opções:
+
+1 - Adicionar chave
+
+2 - Adicionar palavra
+
+3 - Consultar chaves
+
+4 - Consultar palavra
+
+5 - Consultar geral
+
+6 - Remover chave
+
+7 - Remover palavra
+
+0 - Sair
+
+---
+
+# Fluxo Geral do Programa
+
+1. Inicializa a lista principal.
+2. Exibe o menu.
+3. Recebe a opção do usuário.
+4. Executa a operação escolhida.
+5. Retorna ao menu.
+6. Encerra quando o usuário selecionar a opção 0.
+
+---
+
+# Conceitos Aplicados
+
+* Ponteiros
+* Alocação dinâmica
+* Listas simplesmente encadeadas
+* Listas duplamente encadeadas
+* Recursão
+* Manipulação de memória
+* Ordenação alfabética
+* Estruturas de dados dinâmicas
+
+Lista Principal
+
+[A] <-> [M] <-> [S]
+
+[A]
+ |
+ v
+Abacaxi -> Amor -> Avião
+
+[M]
+ |
+ v
+Mesa -> Morango
+
+[S]
+ |
+ v
+Sapato -> Sol
