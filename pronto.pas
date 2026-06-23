@@ -462,5 +462,6 @@ begin
 
 	while i = 1 do
 	begin
+menu(lista,i);
 	end;
 end.
